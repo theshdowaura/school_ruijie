@@ -27,7 +27,7 @@
 # 基本用法
 
 ```shell
-./ruijie_general.sh username password code
+./ruijie_template.sh username password code
 ```
 
 - username 参数为认证用户名。
