@@ -11,10 +11,10 @@ import (
 )
 
 const captiveServerUrl = "http://www.google.cn/generate_204"
-const serviceString = "在这里填写你的互联网接入商，需要对接入商的中文进行两次UrlEncode。如果无需选择互联网接入商，则此处留空。"
+const servicespasswd = ""
 
 func printHelp() {
-	fmt.Println("Usage: ./ruijie username password")
+	fmt.Println("Usage: ./ruijie username password servicepasswd")
 	fmt.Println("Example: ./ruijie 123456 123456")
 }
 
@@ -38,9 +38,9 @@ func getLoginUrlFromHtmlCode(htmlCode string) (string, string) {
 	return loginUrl, queryString
 }
 
-func login(loginUrl, username, password, serviceString, queryString string) (string, error) {
+func login(loginUrl, username, password, servicespasswd, queryString string) (string, error) {
 	client := &http.Client{}
-	loginPostData := fmt.Sprintf("userId=%v&password=%v&service=%v&queryString=%v&operatorPwd=&operatorUserId=&validcode=&passwordEncrypt=false", username, password, serviceString, queryString)
+	loginPostData := fmt.Sprintf("userId=%v&password=%v&service=&queryString=%v&operatorPwd=%v&operatorUserId=&validcode=&passwordEncrypt=false", username, password, queryString,servicespasswd,)
 	request, err := http.NewRequest(http.MethodPost, loginUrl, strings.NewReader(loginPostData))
 	if err != nil {
 		return "", errors.New("can not create login request")
@@ -81,7 +81,7 @@ func main() {
 	loginUrl, queryString := getLoginUrlFromHtmlCode(captiveServerResponseBody)
 	username := os.Args[1]
 	password := os.Args[2]
-	loginResult, err := login(loginUrl, username, password, serviceString, queryString)
+	loginResult, err := login(loginUrl, username, password, servicespasswd, queryString)
 	if err != nil {
 		log.Println(err.Error())
 		return
