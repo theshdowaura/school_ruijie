@@ -40,7 +40,7 @@ func getLoginUrlFromHtmlCode(htmlCode string) (string, string) {
 
 func login(loginUrl, username, password, servicespasswd, queryString string) (string, error) {
 	client := &http.Client{}
-	loginPostData := fmt.Sprintf("userId=%v&password=%v&service=&queryString=%v&operatorPwd=%v&operatorUserId=&validcode=&passwordEncrypt=false", username, password, queryString,servicespasswd,)
+	loginPostData := fmt.Sprintf("userId=%v&password=%v&service=&queryString=%v&operatorPwd=%v&operatorUserId=&validcode=&passwordEncrypt=false", username, password, queryString, servicespasswd)
 	request, err := http.NewRequest(http.MethodPost, loginUrl, strings.NewReader(loginPostData))
 	if err != nil {
 		return "", errors.New("can not create login request")
@@ -62,7 +62,7 @@ func login(loginUrl, username, password, servicespasswd, queryString string) (st
 }
 
 func main() {
-	if len(os.Args) < 2 {
+	if len(os.Args) != 2 {
 		printHelp()
 		return
 	}
@@ -81,6 +81,7 @@ func main() {
 	loginUrl, queryString := getLoginUrlFromHtmlCode(captiveServerResponseBody)
 	username := os.Args[1]
 	password := os.Args[2]
+	servicespasswd := os.Args[3] // 服务密码
 	loginResult, err := login(loginUrl, username, password, servicespasswd, queryString)
 	if err != nil {
 		log.Println(err.Error())
