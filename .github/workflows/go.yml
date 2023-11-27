@@ -1,68 +1,71 @@
-# This workflow will build a golang project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
-
-name: Go-Release
+name: Build and Release
 
 on:
   push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+    branches:
+      - main
 
 jobs:
-
   build:
+    name: Build
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Set up Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: '1.17'
-        
-    - name: Change directory
-      run: cd ./golang
-      
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.RUIJIE_TOKEN }}
-      with:
-        tag_name: v0.1.0
-        release_name: Release v0.1.0
-        body: |
-          Release v0.1.0
-        draft: false
-        prerelease: false
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
+      - name: change dir
+        run: cd ./golang
+      - name: Build and package for Linux (amd64)
+        run: GOOS=linux GOARCH=amd64 go build -o ruijie-linux-amd64
 
-    - name: Upload Linux Binary
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.RUIJIE_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ruijie-linux-amd64
-        asset_name: ruijie-linux-amd64
-        asset_content_type: application/octet-stream
+      - name: Build and package for Linux (arm64)
+        run: GOOS=linux GOARCH=arm64 go build -o ruijie-linux-arm64
 
-    - name: Upload macOS Binary
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.RUIJIE_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ruijie-darwin-amd64
-        asset_name: ruijie-darwin-amd64
-        asset_content_type: application/octet-stream
+      - name: Build and package for macOS (amd64)
+        run: GOOS=darwin GOARCH=amd64 go build -o ruijie-darwin-amd64
 
-    - name: Upload Windows Binary
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.RUIJIE_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ruijie-windows-amd64.exe
-        asset_name: ruijie-windows-amd64.exe
-        asset_content_type: application/octet-stream
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.RUIJIE_TOKEN }}
+        with:
+          tag_name: v1.0.0
+          release_name: Release v1.0.0
+          draft: false
+          prerelease: false
+
+      - name: Upload Linux (amd64) Release Asset
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.RUIJIE_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./ruijie-linux-amd64
+          asset_name: ruijie-linux-amd64
+          asset_content_type: application/octet-stream
+
+      - name: Upload Linux (arm64) Release Asset
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./ruijie-linux-arm64
+          asset_name: ruijie-linux-arm64
+          asset_content_type: application/octet-stream
+
+      - name: Upload macOS (amd64) Release Asset
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.RUIJIE_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./ruijie-darwin-amd64
+          asset_name: ruijie-darwin-amd64
+          asset_content_type: application/octet-stream
