@@ -20,15 +20,15 @@ jobs:
         run: |
           cd golang
           ls -al
-          GOOS=windows GOARCH=amd64 go build -o golang/windows_amd64.exe .
-          GOOS=windows GOARCH=386 go build -o golang/windows_386.exe .
+          GOOS=windows GOARCH=amd64 go build -o windows_amd64.exe .
+          GOOS=windows GOARCH=386 go build -o windows_386.exe .
 
       - name: Build for Linux
         run: |
           cd golang
           ls -al
-          GOOS=linux GOARCH=amd64 go build -o golang/linux_amd64 .
-          GOOS=linux GOARCH=386 go build -o golang/linux_386 .
+          GOOS=linux GOARCH=amd64 go build -o linux_amd64 .
+          GOOS=linux GOARCH=386 go build -o linux_386 .
 
       - name: Create Release
         id: create_release
@@ -47,7 +47,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.RUIJIE_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: golang/windows_amd64.exe
+          asset_path: windows_amd64.exe
           asset_name: windows_amd64.exe
           asset_content_type: application/octet-stream
 
@@ -57,7 +57,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.RUIJIE_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: golang/windows_386.exe
+          asset_path: windows_386.exe
           asset_name: windows_386.exe
           asset_content_type: application/octet-stream
 
@@ -67,7 +67,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.RUIJIE_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: golang/linux_amd64
+          asset_path: linux_amd64
           asset_name: linux_amd64
           asset_content_type: application/octet-stream
 
@@ -77,6 +77,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.RUIJIE_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: golang/linux_386
+          asset_path: linux_386
           asset_name: linux_386
           asset_content_type: application/octet-stream
