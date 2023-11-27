@@ -15,19 +15,18 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: 1.17
-
+      - name: cd golang
+        run: cd golang
       - name: Build for Windows
         run: |
-          cd golang
-          ls -al
           GOOS=windows GOARCH=amd64 go build -o windows_amd64.exe .
+          ls -al
           GOOS=windows GOARCH=386 go build -o windows_386.exe .
 
       - name: Build for Linux
         run: |
-          cd golang
-          ls -al
           GOOS=linux GOARCH=amd64 go build -o linux_amd64 .
+          ls -al
           GOOS=linux GOARCH=386 go build -o linux_386 .
 
       - name: Create Release
