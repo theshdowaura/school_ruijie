@@ -16,7 +16,9 @@ jobs:
         with:
           go-version: 1.17
       - name: cd golang
-        run: cd golang
+        run: |
+              cd golang
+              go mod init ruijie
       - name: Build for Windows
         run: |
           GOOS=windows GOARCH=amd64 go build -o windows_amd64.exe 
