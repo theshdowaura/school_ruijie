@@ -35,7 +35,8 @@ jobs:
           release_name: Release ${{ github.run_number }}
           draft: false
           prerelease: false
-      - name: |
+      - name: pwd
+         run:|
               pwd
               ls -al  
       
