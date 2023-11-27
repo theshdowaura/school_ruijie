@@ -1,14 +1,12 @@
 name: Build and Release
+
 on:
   push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
-
+    branches:
+      - main
 
 jobs:
-  build:
-    name: Build
+  build-and-release:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,54 +17,66 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: 1.17
-      - name: change dir
-        run: cd ./golang
-      - name: Build and package for Linux (amd64)
-        run: GOOS=linux GOARCH=amd64 go build ruijie.go -o ruijie-linux-amd64
 
-      - name: Build and package for Linux (arm64)
-        run: GOOS=linux GOARCH=arm64 go build ruijie.go -o ruijie-linux-arm64
+      - name: Build for Windows
+        run: |
+          go get -v ./...
+          GOOS=windows GOARCH=amd64 go build -o golang/windows_amd64.exe ./golang
+          GOOS=windows GOARCH=386 go build -o golang/windows_386.exe ./golang
 
-      - name: Build and package for macOS (amd64)
-        run: GOOS=darwin GOARCH=amd64 go build ruijie.go -o ruijie-darwin-amd64
+      - name: Build for Linux
+        run: |
+          go get -v ./...
+          GOOS=linux GOARCH=amd64 go build -o golang/linux_amd64 ./golang
+          GOOS=linux GOARCH=386 go build -o golang/linux_386 ./golang
 
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1.0.0
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.RUIJIE_TOKEN }}
         with:
-          tag_name: v1.0.0
-          release_name: Release v1.0.0
+          tag_name: v${{ github.run_number }}
+          release_name: Release ${{ github.run_number }}
           draft: false
           prerelease: false
 
-      - name: Upload Linux (amd64) Release Asset
-        uses: actions/upload-release-asset@v1.0.2
+      - name: Upload Windows Binaries
+        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.RUIJIE_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./ruijie-linux-amd64
-          asset_name: ruijie-linux-amd64
+          asset_path: golang/windows_amd64.exe
+          asset_name: windows_amd64.exe
           asset_content_type: application/octet-stream
 
-      - name: Upload Linux (arm64) Release Asset
-        uses: actions/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./ruijie-linux-arm64
-          asset_name: ruijie-linux-arm64
-          asset_content_type: application/octet-stream
-
-      - name: Upload macOS (amd64) Release Asset
-        uses: actions/upload-release-asset@v1.0.2
+      - name: Upload Windows Binaries (386)
+        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.RUIJIE_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./ruijie-darwin-amd64
-          asset_name: ruijie-darwin-amd64
+          asset_path: golang/windows_386.exe
+          asset_name: windows_386.exe
+          asset_content_type: application/octet-stream
+
+      - name: Upload Linux Binaries
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.RUIJIE_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: golang/linux_amd64
+          asset_name: linux_amd64
+          asset_content_type: application/octet-stream
+
+      - name: Upload Linux Binaries (386)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.RUIJIE_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: golang/linux_386
+          asset_name: linux_386
           asset_content_type: application/octet-stream
