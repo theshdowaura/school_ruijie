@@ -30,10 +30,10 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.RUIJIE_TOKEN }}
       with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
+        tag_name: v0.1.0
+        release_name: Release v0.1.0
         body: |
-          Release ${{ github.ref }}
+          Release v0.1.0
         draft: false
         prerelease: false
 
