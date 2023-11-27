@@ -25,9 +25,14 @@
 3. 认证成功。
 
 # 基本用法
+shell脚本:
 
 ```shell
 ./ruijie_template.sh username password code
+```
+windows使用:
+```cmd
+windows_amd64.exe username password code
 ```
 
 - username 参数为认证用户名。
@@ -42,7 +47,7 @@
 如果你所在的学校需要在认证过程中输入验证码，则不适合使用这个 shell script 进行认证，需要使用 Python 等脚本语言实现验证码识别功能再进行认证。
 
 
-在此之上是原作者的评鉴，我之后会添加相关功能。应该会添加的其他分支。
+
 
 # 后记
 
