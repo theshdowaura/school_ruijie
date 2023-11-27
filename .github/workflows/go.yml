@@ -18,13 +18,13 @@ jobs:
 
       - name: Build for Windows
         run: |
-          go get -v ./...
+          ls -al
           GOOS=windows GOARCH=amd64 go build -o golang/windows_amd64.exe ./golang
           GOOS=windows GOARCH=386 go build -o golang/windows_386.exe ./golang
 
       - name: Build for Linux
         run: |
-          go get -v ./...
+          ls -al
           GOOS=linux GOARCH=amd64 go build -o golang/linux_amd64 ./golang
           GOOS=linux GOARCH=386 go build -o golang/linux_386 ./golang
 
