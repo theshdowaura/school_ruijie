@@ -25,6 +25,8 @@ jobs:
 
       - name: Build for Linux
         run: |
+          go mod init ruijie
+          go mod tidy
           GOOS=linux GOARCH=amd64 go build -o linux_amd64 
           GOOS=linux GOARCH=386 go build -o linux_386 
 
