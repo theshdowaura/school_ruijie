@@ -17,11 +17,13 @@ jobs:
     - uses: actions/checkout@v3
 
     - name: Set up Go
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v2
       with:
-        go-version: '1.27'
+        go-version: '1.17'
+        
     - name: Change directory
       run: cd ./golang
+      
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
