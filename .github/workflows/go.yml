@@ -18,15 +18,17 @@ jobs:
 
       - name: Build for Windows
         run: |
+          cd golang
           ls -al
-          GOOS=windows GOARCH=amd64 go build -o golang/windows_amd64.exe ./golang
-          GOOS=windows GOARCH=386 go build -o golang/windows_386.exe ./golang
+          GOOS=windows GOARCH=amd64 go build -o golang/windows_amd64.exe .
+          GOOS=windows GOARCH=386 go build -o golang/windows_386.exe .
 
       - name: Build for Linux
         run: |
+          cd golang
           ls -al
-          GOOS=linux GOARCH=amd64 go build -o golang/linux_amd64 ./golang
-          GOOS=linux GOARCH=386 go build -o golang/linux_386 ./golang
+          GOOS=linux GOARCH=amd64 go build -o golang/linux_amd64 .
+          GOOS=linux GOARCH=386 go build -o golang/linux_386 .
 
       - name: Create Release
         id: create_release
