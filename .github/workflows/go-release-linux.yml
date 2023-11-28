@@ -18,17 +18,13 @@ jobs:
       with:
         go-version: '1.20'
 
-    - name: changed dir to golang
-      run: cd ./golang
-
-    - name: go init mod 
+    - name: changed dir to golang and Build Linux Bin
       run: |
+            cd ./golang
             go mod init main
             go mod tidy
-    - name: Build Linux Bin
-    - run: |
-          GOOS=linux GOARCH=amd64 go build -o linux_amd64
-          GOOS=linux GOARCH=386 go build -o linux_386
+            GOOS=linux GOARCH=amd64 go build -o linux_amd64
+            GOOS=linux GOARCH=386 go build -o linux_386
     - name: Create Release
         id:create_release
         uses:actions/create-release@v1
@@ -58,12 +54,7 @@ jobs:
         asset_path: ./golang/linux_386
         asset_name: linux_386
         asset_content_type: application/octet-stream
-    - name: Upload Darwin Binaries
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.RUIJIE_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
+
         asset_path: ./golang/darwin_amd64
         asset_name: darwin_amd64
         asset_content_type: application/octet-stream
