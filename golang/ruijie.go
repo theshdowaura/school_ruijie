@@ -3,7 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -11,7 +11,6 @@ import (
 )
 
 const captiveServerUrl = "http://www.google.cn/generate_204"
-const servicespasswd = ""
 
 func printHelp() {
 	fmt.Println("Usage: ./ruijie username password servicepasswd")
@@ -24,7 +23,7 @@ func getCaptiveServerResponseStatusCodeAndBody() (int, string, error) {
 		return -1, "", errors.New("can not send get request to captive server")
 	}
 	defer response.Body.Close()
-	body, err := ioutil.ReadAll(response.Body)
+	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		return -1, "", errors.New("can not read captive server response body")
 	}
@@ -38,7 +37,7 @@ func getLoginUrlFromHtmlCode(htmlCode string) (string, string) {
 	return loginUrl, queryString
 }
 
-func login(loginUrl, username, password, servicespasswd, queryString string) (string, error) {
+func login(loginUrl, username, password, queryString, servicespasswd string) (string, error) {
 	client := &http.Client{}
 	loginPostData := fmt.Sprintf("userId=%v&password=%v&service=&queryString=%v&operatorPwd=%v&operatorUserId=&validcode=&passwordEncrypt=false", username, password, queryString, servicespasswd)
 	request, err := http.NewRequest(http.MethodPost, loginUrl, strings.NewReader(loginPostData))
@@ -54,7 +53,7 @@ func login(loginUrl, username, password, servicespasswd, queryString string) (st
 		return "", errors.New("can not send login request")
 	}
 	defer response.Body.Close()
-	body, err := ioutil.ReadAll(response.Body)
+	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		return "", errors.New("can not read login response body")
 	}
@@ -62,7 +61,7 @@ func login(loginUrl, username, password, servicespasswd, queryString string) (st
 }
 
 func main() {
-	if len(os.Args) != 2 {
+	if len(os.Args) < 2 {
 		printHelp()
 		return
 	}
@@ -81,8 +80,11 @@ func main() {
 	loginUrl, queryString := getLoginUrlFromHtmlCode(captiveServerResponseBody)
 	username := os.Args[1]
 	password := os.Args[2]
-	servicespasswd := os.Args[3] // 服务密码
-	loginResult, err := login(loginUrl, username, password, servicespasswd, queryString)
+	servicespasswd := "" // 服务密码
+	if len(os.Args) > 3 {
+		servicespasswd = os.Args[3] // 服务密码
+	}
+	loginResult, err := login(loginUrl, username, password, queryString, servicespasswd)
 	if err != nil {
 		log.Println(err.Error())
 		return
