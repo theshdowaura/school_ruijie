@@ -1,5 +1,6 @@
 # Introduction
 [简体中文(Simple Chinese)](./README.MD) | English
+
 This script implements the login for Ruijie ePortal Web authentication. It requires the support of the curl command and uses curl to send the necessary POST data packets for web authentication.
 
 If your school also uses Ruijie for campus network authentication and has enabled the Web authentication method (as shown in the image below), you should be able to use this script for authentication.

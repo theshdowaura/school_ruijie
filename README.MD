@@ -1,5 +1,6 @@
 # 简介
 简体中文(Simple Chinese) | [English](./README-en.MD)
+
 本脚本实现了锐捷 ePortal Web 认证的登录，需要 curl 指令的支持，通过 curl 发送认证所需的 POST 数据包来实现 Web 认证。
 
 如果你所在的学校也是使用锐捷进行校园网认证，并且开启了 Web 的认证方式（如下图），那么应该是可以使用本脚本进行认证的。
