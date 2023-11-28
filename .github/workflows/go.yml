@@ -27,8 +27,12 @@ jobs:
           go mod tidy
           GOOS=windows GOARCH=amd64 go build -o windows_amd64.exe 
           GOOS=windows GOARCH=386 go build -o windows_386.exe
-          GOOS=linux GOARCH=amd64 go build -o linux_amd64
-          GOOS=linux GOARCH=386 go build -o linux_386
+      - name: Build for linux
+         run:|
+           GOOS=linux GOARCH=amd64 go build -o linux_amd64
+           GOOS=linux GOARCH=386 go build -o linux_386
+      - name: Build for MacOS
+        run: |
           GOOS=darwin GOARCH=amd64 go build -o darwin_amd64
           GOOS=darwin GOARCH=386 go build -o darwin_386 
 
