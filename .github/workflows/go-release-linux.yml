@@ -1,60 +1,54 @@
-# This workflow will build a golang project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
-
 name: Go-Release-linux
 
 on:
   workflow_dispatch:
 
 jobs:
-
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: '1.20'
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
 
-    - name: changed dir to golang and Build Linux Bin
-      run: |
-            cd ./golang
-            go mod init main
-            go mod tidy
-            GOOS=linux GOARCH=amd64 go build -o linux_amd64
-            GOOS=linux GOARCH=386 go build -o linux_386
-    - name: Create Release
-        id:create_release
-        uses:actions/create-release@v1
-      env:
+      - name: changed dir to golang and Build Linux Bin
+        run: |
+          cd ./golang
+          go mod init main
+          go mod tidy
+          GOOS=linux GOARCH=amd64 go build -o linux_amd64
+          GOOS=linux GOARCH=386 go build -o linux_386
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
           GITHUB_TOKEN: ${{ secrets.RUIJIE_TOKEN }}
-      with:
+        with:
           tag_name: v${{ github.run_number }}
           release_name: Release ${{ github.run_number }}
           draft: true
           prerelease: false
-          
-    - name: Upload Linux Binaries
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.RUIJIE_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./golang/linux_amd64
-        asset_name: linux_amd64
-        asset_content_type: application/octet-stream
-    - name: Upload Linux Binaries (386)
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.RUIJIE_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./golang/linux_386
-        asset_name: linux_386
-        asset_content_type: application/octet-stream
 
-        asset_path: ./golang/darwin_amd64
-        asset_name: darwin_amd64
-        asset_content_type: application/octet-stream
+      - name: Upload Linux Binaries
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.RUIJIE_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./golang/linux_amd64
+          asset_name: linux_amd64
+          asset_content_type: application/octet-stream
+
+      - name: Upload Linux Binaries (386)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.RUIJIE_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./golang/linux_386
+          asset_name: linux_386
+          asset_content_type: application/octet-stream
