@@ -1,0 +1,75 @@
+name: Go-Release-Macos
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+
+      - name: changed dir to golang and Build Linux Bin
+        run: |
+          cd ./golang
+          go mod init main
+          go mod tidy
+          GOOS=linux GOARCH=amd64 go build -o ruijie_linux_amd64
+          GOOS=linux GOARCH=386 go build -o ruijie_linux_386
+          GOOS=linux GOARCH=arm GOARM=7 go build -o rujie_linux_armv7
+          GOOS=linux GOARCH=arm64 go build -o linux_armv8
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.RUIJIE_TOKEN }}
+        with:
+          tag_name: v${{ github.run_number }}
+          release_name: Release ${{ github.run_number }}
+          draft: true
+          prerelease: false
+
+      - name: Upload Linux Binaries
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.RUIJIE_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./golang/ruijie_linux_amd64
+          asset_name: ruijie_linux_amd64
+          asset_content_type: application/octet-stream
+
+      - name: Upload Linux Binaries (386)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.RUIJIE_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./golang/ruijie_linux_386
+          asset_name: ruijie_linux_386
+          asset_content_type: application/octet-stream
+      - name: Upload Linux Binaries (ARMv7)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.RUIJIE_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./golang/rujie_linux_armv7
+          asset_name: rujie_linux_armv7
+          asset_content_type: application/octet-stream
+
+      - name: Upload Linux Binaries (ARMv8)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.RUIJIE_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./golang/linux_armv8
+          asset_name: linux_armv8
+          asset_content_type: application/octet-stream  
+        
