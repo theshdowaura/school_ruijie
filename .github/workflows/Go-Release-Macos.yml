@@ -27,7 +27,7 @@ jobs:
         id: create_release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.RUIJIE_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.REPO_ADMIN }}
         with:
           tag_name: v${{ github.run_number }}
           release_name: Release ${{ github.run_number }}
@@ -37,7 +37,7 @@ jobs:
       - name: Upload macOS Binaries (amd64)
         uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.RUIJIE_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.REPO_ADMIN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./golang/ruijie_darwin_amd64
@@ -47,7 +47,7 @@ jobs:
       - name: Upload macOS Binaries (arm64)
         uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.RUIJIE_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.REPO_ADMIN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./golang/ruijie_darwin_arm64
