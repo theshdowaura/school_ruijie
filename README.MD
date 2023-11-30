@@ -64,3 +64,6 @@ macos amd64平台使用:
 # 友情链接
 https://github.com/callmeliwen/RuijiePortalLoginTool
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=theshdowaura/school_ruijie&type=Date)](https://star-history.com/#theshdowaura/school_ruijie&Date)
