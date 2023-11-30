@@ -25,16 +25,22 @@
 3. 认证成功。
 
 # 基本用法
+** 请注意 linux与macos请授予执行权限 **
+```shell
+chmod +x ruijie_{platform}_{Architecture}
+```
 shell脚本:
-
 ```shell
 ./ruijie_template.sh username password code
 ```
-windows使用:
+windows amd64平台使用:
 ```cmd
-windows_amd64.exe username password code
+ruijie_windows_amd64.exe username password code
 ```
-
+macos amd64平台使用:
+```cmd
+./ruijie_darwin_amd64 username password code
+```
 - username 参数为认证用户名。
 - password 参数为认证密码。
 - code 参数为运营商密码（无则忽略）
@@ -51,7 +57,10 @@ windows_amd64.exe username password code
 
 # 后记
 
-锐捷的 ePortal Web 认证上了之后，向 `InterFace.do?method=getOnlineUserInfo` 这个接口中 Post 提交 `userIndex` 参数会明文显示用户的密码，感觉一点安全性都没有。（集美大学在认证系统升级之后已修复该问题）
+锐捷的 ePortal Web 认证上了之后，向 `InterFace.do?method=getOnlineUserInfo` 这个接口中 Post 提交 `userIndex` 参数会明文显示用户的密码(部分学校已修复)，感觉一点安全性都没有。（集美大学在认证系统升级之后已修复该问题）
 
-我所在的学校在未认证的情况下，53端口(DNS)似乎是可以正常通信的。如果你所在的学校也有类似的情况，也许可以尝试搭建个53端口的代理实现免认证上网。
+我所在的学校在未认证的情况下，53端口(DNS)似乎是可以正常通信的(我这里不支持隧道)。如果你所在的学校也有类似的情况，也许可以尝试搭建个53端口的代理实现免认证上网。
+
+# 友情链接
+https://github.com/callmeliwen/RuijiePortalLoginTool
 
