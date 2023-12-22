@@ -1,22 +1,23 @@
-package main
+package core
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
 	"strings"
 )
 
-const captiveServerUrl = "http://www.google.cn/generate_204"
-const serviceString = "在这里填写你的互联网接入商，需要对接入商的中文进行两次UrlEncode。如果无需选择互联网接入商，则此处留空。"
-
-func printHelp() {
-	fmt.Println("Usage: ./ruijie username password")
-	fmt.Println("Example: ./ruijie 123456 123456")
+type Config struct {
+	Username       string `json:"username"`
+	Password       string `json:"password"`
+	ServicesPasswd string `json:"servicesPasswd"`
 }
+
+const captiveServerUrl = "http://www.google.cn/generate_204"
 
 func getCaptiveServerResponseStatusCodeAndBody() (int, string, error) {
 	response, err := http.Get(captiveServerUrl)
@@ -24,7 +25,7 @@ func getCaptiveServerResponseStatusCodeAndBody() (int, string, error) {
 		return -1, "", errors.New("can not send get request to captive server")
 	}
 	defer response.Body.Close()
-	body, err := ioutil.ReadAll(response.Body)
+	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		return -1, "", errors.New("can not read captive server response body")
 	}
@@ -38,9 +39,9 @@ func getLoginUrlFromHtmlCode(htmlCode string) (string, string) {
 	return loginUrl, queryString
 }
 
-func login(loginUrl, username, password, serviceString, queryString string) (string, error) {
+func login(loginUrl, username, password, queryString, servicespasswd string) (string, error) {
 	client := &http.Client{}
-	loginPostData := fmt.Sprintf("userId=%v&password=%v&service=%v&queryString=%v&operatorPwd=&operatorUserId=&validcode=&passwordEncrypt=false", username, password, serviceString, queryString)
+	loginPostData := fmt.Sprintf("userId=%v&password=%v&service=&queryString=%v&operatorPwd=%v&operatorUserId=&validcode=&passwordEncrypt=false", username, password, queryString, servicespasswd)
 	request, err := http.NewRequest(http.MethodPost, loginUrl, strings.NewReader(loginPostData))
 	if err != nil {
 		return "", errors.New("can not create login request")
@@ -54,18 +55,21 @@ func login(loginUrl, username, password, serviceString, queryString string) (str
 		return "", errors.New("can not send login request")
 	}
 	defer response.Body.Close()
-	body, err := ioutil.ReadAll(response.Body)
+	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		return "", errors.New("can not read login response body")
 	}
 	return string(body), nil
 }
-
-func main() {
-	if len(os.Args) < 2 {
-		printHelp()
-		return
+func ExecLoginRuijie() {
+	config, err := loadConfig("config.json")
+	if err != nil {
+		log.Fatal(err)
 	}
+	RuijieLogin(config)
+}
+
+func RuijieLogin(config Config) {
 	// Check network status
 	captiveServerStatusCode, captiveServerResponseBody, err := getCaptiveServerResponseStatusCodeAndBody()
 	if err != nil {
@@ -79,12 +83,26 @@ func main() {
 	}
 	// Start ruijie login
 	loginUrl, queryString := getLoginUrlFromHtmlCode(captiveServerResponseBody)
-	username := os.Args[1]
-	password := os.Args[2]
-	loginResult, err := login(loginUrl, username, password, serviceString, queryString)
+	loginResult, err := login(loginUrl, config.Username, config.Password, queryString, config.ServicesPasswd)
 	if err != nil {
 		log.Println(err.Error())
 		return
 	}
 	log.Println(loginResult)
+}
+func loadConfig(filename string) (Config, error) {
+	file, err := os.Open(filename)
+	if err != nil {
+		return Config{}, err
+	}
+	defer file.Close()
+
+	var config Config
+	decoder := json.NewDecoder(file)
+	err = decoder.Decode(&config)
+	if err != nil {
+		return Config{}, err
+	}
+
+	return config, nil
 }
