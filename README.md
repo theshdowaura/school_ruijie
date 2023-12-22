@@ -19,5 +19,7 @@ cd school_ruijie
 ```
 3. 编译
 ```shell
+go mod init school_ruijie
+go mod tidy
 go build .
 ```
