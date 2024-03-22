@@ -2,20 +2,15 @@ package main
 
 import (
 	"errors"
+	"flag"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 )
 
 const captiveServerUrl = "http://www.google.cn/generate_204"
-
-func printHelp() {
-	fmt.Println("Usage: ./ruijie username password servicepasswd")
-	fmt.Println("Example: ./ruijie 123456 123456")
-}
 
 func getCaptiveServerResponseStatusCodeAndBody() (int, string, error) {
 	response, err := http.Get(captiveServerUrl)
@@ -61,10 +56,13 @@ func login(loginUrl, username, password, queryString, servicespasswd string) (st
 }
 
 func main() {
-	if len(os.Args) < 2 {
-		printHelp()
-		return
-	}
+	u := flag.String("u", "", "school_id")
+	p := flag.String("p", "", "school_id passwd")
+	c := flag.String("c", "", "school_id Carrier password")
+	flag.Parse()
+	username := *u
+	password := *p
+	servicespasswd := *c
 	// Check network status
 	captiveServerStatusCode, captiveServerResponseBody, err := getCaptiveServerResponseStatusCodeAndBody()
 	if err != nil {
@@ -78,12 +76,6 @@ func main() {
 	}
 	// Start ruijie login
 	loginUrl, queryString := getLoginUrlFromHtmlCode(captiveServerResponseBody)
-	username := os.Args[1]
-	password := os.Args[2]
-	servicespasswd := "" // 服务密码
-	if len(os.Args) > 3 {
-		servicespasswd = os.Args[3] // 服务密码
-	}
 	loginResult, err := login(loginUrl, username, password, queryString, servicespasswd)
 	if err != nil {
 		log.Println(err.Error())
