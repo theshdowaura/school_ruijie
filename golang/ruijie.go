@@ -4,9 +4,11 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"golang.org/x/crypto/ssh/terminal"
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 )
 
@@ -68,13 +70,18 @@ func login(loginUrl, username, password, serviceString, queryString, servicespas
 
 func main() {
 	username := flag.String("u", "", "your school id")
-	password := flag.String("p", "", "your school id passwd")
 	code := flag.String("c", "", "your carrier password")
 	flag.Parse()
 	usernameV := *username
-	passwordV := *password
+	fmt.Println("Enter your school id passwd:")
+	bytePassword, err2 := terminal.ReadPassword(int(os.Stdin.Fd()))
+	if err2 != nil {
+		log.Println(err2.Error())
+		return
+	}
+	passwordV := string(bytePassword)
 	codeV := *code
-	if *username == "" || *password == "" {
+	if *username == "" {
 		fmt.Println("Username and password are required.\n" +
 			"example: ruijie -u xxx -p xxx ")
 		return
@@ -92,6 +99,7 @@ func main() {
 	}
 	// Start ruijie login
 	loginUrl, queryString := getLoginUrlFromHtmlCode(captiveServerResponseBody)
+
 	loginResult, err := login(loginUrl, usernameV, passwordV, serviceString, queryString, codeV)
 	if err != nil {
 		log.Println(err.Error())
