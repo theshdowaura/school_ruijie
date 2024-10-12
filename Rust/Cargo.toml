@@ -1,0 +1,15 @@
+[package]
+name = "school_ruijie_rust"
+version = "0.1.1"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[profile.release]
+lto = true          # 启用链接时间优化
+codegen-units = 1   # 减少代码生成单元数
+
+[dependencies]
+clap = { version = "4.0", features = ["derive"] }
+reqwest = { version = "0.11", features = ["blocking"] }
+ping = "0.3"
+ping-rs = "0.1.2"
