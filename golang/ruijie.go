@@ -8,9 +8,15 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
+
+	"github.com/go-ping/ping"
 )
 
-const captiveServerUrl = "http://www.google.cn/generate_204"
+const (
+	captiveServerUrl = "http://www.google.cn/generate_204"
+	pingHost         = "180.101.50.188" // 设置 Ping 的目标服务器
+)
 
 func getCaptiveServerResponseStatusCodeAndBody() (int, string, error) {
 	response, err := http.Get(captiveServerUrl)
@@ -55,31 +61,80 @@ func login(loginUrl, username, password, queryString, servicespasswd string) (st
 	return string(body), nil
 }
 
-func main() {
-	u := flag.String("u", "", "school_id")
-	p := flag.String("p", "", "school_id passwd")
-	c := flag.String("c", "", "school_id Carrier password")
-	flag.Parse()
-	username := *u
-	password := *p
-	servicespasswd := *c
+func startPingCheck(username, password, servicespasswd string) {
+	ticker := time.NewTicker(10 * time.Second)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ticker.C:
+			// 使用 ping 检测网络连接
+			pinger, err := ping.NewPinger(pingHost)
+			if err != nil {
+				log.Println("Failed to create pinger:", err)
+				continue
+			}
+			pinger.Count = 3
+			pinger.Timeout = time.Second * 10
+			err = pinger.Run()
+			if err != nil || pinger.Statistics().PacketLoss > 0 {
+				log.Println("Ping failed, packet loss detected. Re-authenticating...")
+				// 检查网络状态并重新认证
+				err := reAuthenticate(username, password, servicespasswd)
+				if err != nil {
+					log.Println("Re-authentication failed:", err)
+				} else {
+					log.Println("Re-authentication successful!")
+				}
+			} else {
+				log.Println("Network is stable.")
+			}
+		}
+	}
+}
+
+func reAuthenticate(username, password, servicespasswd string) error {
 	// Check network status
 	captiveServerStatusCode, captiveServerResponseBody, err := getCaptiveServerResponseStatusCodeAndBody()
 	if err != nil {
-		log.Println(err.Error())
-		return
+		return err
 	}
 	if captiveServerStatusCode == 204 {
 		// Exit when user is already online
 		log.Println("You are already online!")
-		return
+		return nil
 	}
 	// Start ruijie login
 	loginUrl, queryString := getLoginUrlFromHtmlCode(captiveServerResponseBody)
 	loginResult, err := login(loginUrl, username, password, queryString, servicespasswd)
 	if err != nil {
-		log.Println(err.Error())
-		return
+		return err
 	}
 	log.Println(loginResult)
+	return nil
+}
+
+func main() {
+	u := flag.String("u", "", "school_id")
+	p := flag.String("p", "", "school_id passwd")
+	c := flag.String("c", "", "school_id Carrier password")
+	e := flag.String("e", "", "Persistent Login status")
+	flag.Parse()
+
+	username := *u
+	password := *p
+	servicespasswd := *c
+	environment := *e
+	// 初次认证
+	err := reAuthenticate(username, password, servicespasswd)
+	if err != nil {
+		log.Println("Initial authentication failed:", err)
+		return
+	}
+
+	// 开始 Ping 检测
+	if environment == "on" {
+		startPingCheck(username, password, servicespasswd)
+	}
+
 }

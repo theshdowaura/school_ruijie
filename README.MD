@@ -35,16 +35,16 @@ shell脚本:
 ```
 windows amd64平台使用:
 ```cmd
-ruijie_windows_amd64.exe username password code
+ruijie_windows_amd64.exe -u username -p password -c code -e on
 ```
 macos amd64平台使用:
 ```cmd
-./ruijie_darwin_amd64 username password code
+./ruijie_darwin_amd64 -u username -p password -c code -e on
 ```
 - username 参数为认证用户名。
 - password 参数为认证密码。
 - code 参数为运营商密码（无则忽略）
-
+- on （可选） 参数为持久化登录，默认每十秒检测一次
 ## 图形化客户端
 在fyne分支上请自行编译客户端,master分支仅发布内核
 
